@@ -1,0 +1,958 @@
+
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#17080d">
+<title>NICOSTORE MY</title>
+
+<style>
+:root {
+  --bg: #10070b;
+  --card: #261019;
+  --maroon: #791b35;
+  --red: #d93659;
+  --pink: #ff91aa;
+  --text: #fff5f7;
+  --muted: #cbb0b9;
+  --line: #542234;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  color: var(--text);
+  background: radial-gradient(ellipse at top, #451326, var(--bg) 55%);
+  font-family: Arial, sans-serif;
+}
+
+button, input, select, textarea { font: inherit; }
+button, a { -webkit-tap-highlight-color: transparent; }
+button { cursor: pointer; }
+a { text-decoration: none; color: inherit; }
+
+.wrap {
+  width: 92%;
+  max-width: 1100px;
+  margin: auto;
+}
+
+header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #16090ef5;
+  border-bottom: 1px solid var(--line);
+}
+
+.nav {
+  min-height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.logo {
+  font-size: 19px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.logo span { color: var(--pink); }
+
+.nav-actions {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+}
+
+.btn {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 13px;
+  border: 1px solid #a63855;
+  border-radius: 10px;
+  background: var(--maroon);
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.btn.secondary {
+  background: #29131c;
+  border-color: var(--line);
+}
+
+.count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 4px;
+  border-radius: 50px;
+  background: white;
+  color: var(--maroon);
+}
+
+.menu-button {
+  display: none;
+  background: none;
+  border: 0;
+  color: white;
+  font-size: 23px;
+}
+
+.menu {
+  display: none;
+  padding: 15px 0;
+  gap: 20px;
+}
+
+.menu.open { display: flex; }
+.menu a { color: var(--pink); }
+
+.hero { padding: 20px 0 30px; }
+
+.hero-card {
+  padding: 32px 22px;
+  border: 1px solid #9c2b49;
+  border-radius: 19px;
+  text-align: center;
+  background:
+    radial-gradient(ellipse at 0% 30%, #861b3b, transparent 55%),
+    linear-gradient(135deg, #35101e, #13080d 70%, #491225);
+  box-shadow: 0 12px 35px #0004;
+}
+
+.eyebrow {
+  color: var(--pink);
+  font-size: 11px;
+  letter-spacing: 4px;
+  font-weight: bold;
+}
+
+.hero h1 {
+  font-size: clamp(27px, 6vw, 48px);
+  font-style: italic;
+  line-height: 1.1;
+  margin: 16px 0;
+}
+
+.hero h1 span {
+  display: block;
+  color: var(--red);
+  margin-top: 5px;
+}
+
+.hero p {
+  color: #e7cbd3;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.hero-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 20px;
+}
+
+.section {
+  padding: 20px 0 35px;
+  scroll-margin-top: 85px;
+}
+
+.section h2 {
+  font-size: 25px;
+  margin: 0 0 8px;
+}
+
+.section h2 span { color: var(--pink); }
+
+.subtitle {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+  margin-bottom: 18px;
+}
+
+.search {
+  width: 100%;
+  padding: 13px;
+  margin-bottom: 13px;
+  border-radius: 11px;
+  border: 1px solid var(--line);
+  background: #1b0c12;
+  color: white;
+  outline: none;
+}
+
+.filters {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 15px;
+}
+
+.filter {
+  flex-shrink: 0;
+  padding: 9px 13px;
+  border: 1px solid var(--line);
+  border-radius: 30px;
+  color: var(--muted);
+  background: #1b0c12;
+}
+
+.filter.active {
+  background: var(--maroon);
+  border-color: var(--red);
+  color: white;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.product {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 11px;
+  border: 1px solid #69283b;
+  border-radius: 15px;
+  background: linear-gradient(145deg, #401422, #1c0d13);
+}
+
+.art {
+  width: 100%;
+  aspect-ratio: 1.5;
+  display: grid;
+  place-items: center;
+  margin-bottom: 10px;
+  border: 1px solid #8c3450;
+  border-radius: 11px;
+  background: linear-gradient(135deg, #8a2140, #260b15);
+  font-size: 38px;
+}
+
+.tag {
+  color: var(--pink);
+  font-size: 10px;
+  margin-bottom: 5px;
+}
+
+.product h3 {
+  font-size: 14px;
+  margin: 0 0 6px;
+  overflow-wrap: anywhere;
+}
+
+.product p {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 0 0 13px;
+  flex: 1;
+}
+
+.price-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-top: auto;
+}
+
+.price {
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.product .btn { padding: 9px 10px; }
+
+.notice {
+  margin-top: 15px;
+  padding: 13px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #211019;
+  color: #dfc5ce;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.panel {
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #1b0e14;
+}
+
+.panel h3 { margin: 0 0 12px; }
+
+.empty {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+  padding: 15px 0;
+}
+
+.cart-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.cart-name { font-size: 13px; font-weight: bold; }
+
+.muted {
+  color: var(--muted);
+  font-size: 11px;
+  margin-top: 5px;
+}
+
+.qty {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 9px;
+}
+
+.qty button {
+  width: 28px;
+  height: 28px;
+  border: 1px solid #653044;
+  border-radius: 8px;
+  color: white;
+  background: #301522;
+}
+
+.remove {
+  width: auto !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: var(--pink) !important;
+  font-size: 11px;
+}
+
+.line-total { font-size: 13px; font-weight: bold; }
+
+.total {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 16px;
+  font-weight: 900;
+}
+
+.checkout-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+.field { margin-bottom: 13px; }
+
+.field label {
+  display: block;
+  font-size: 12px;
+  font-weight: bold;
+  margin-bottom: 7px;
+}
+
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #56303d;
+  border-radius: 10px;
+  color: white;
+  background: #10070b;
+  outline: none;
+}
+
+.field textarea { min-height: 75px; }
+
+.help {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.full { width: 100%; }
+
+.success {
+  display: none;
+  margin-top: 15px;
+  padding: 13px;
+  border: 1px solid #386c50;
+  border-radius: 12px;
+  background: #102219;
+}
+
+.success.show { display: block; }
+
+.success pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: white;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+footer {
+  margin-top: 20px;
+  padding: 25px 0;
+  text-align: center;
+  color: var(--muted);
+  background: #16090e;
+  border-top: 1px solid var(--line);
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+footer strong { color: var(--pink); }
+
+.toast {
+  position: fixed;
+  bottom: 18px;
+  left: 50%;
+  z-index: 20;
+  transform: translateX(-50%);
+  display: none;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: white;
+  color: #35101e;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.toast.show { display: block; }
+
+@media (min-width: 560px) {
+  .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (min-width: 850px) {
+  .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .checkout-grid { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 520px) {
+  .menu-button { display: block; }
+  .logo { font-size: 14px; }
+  .nav-actions .products-link { display: none; }
+}
+</style>
+</head>
+
+<body>
+<header>
+  <div class="wrap nav">
+    <button class="menu-button" id="menuButton" aria-label="Menu">☰</button>
+
+    <a class="logo" href="#">NICO<span>STORE MY</span></a>
+
+    <div class="nav-actions">
+      <a class="btn secondary products-link" href="#products">Produk</a>
+      <a class="btn" href="#cart">Cart <span class="count" id="cartCount">0</span></a>
+    </div>
+  </div>
+
+  <nav class="menu wrap" id="menu">
+    <a href="#products">Produk</a>
+    <a href="#cart">Shopping Cart</a>
+    <a href="#checkout">Checkout</a>
+  </nav>
+</header>
+
+<main>
+  <section class="hero wrap">
+    <div class="hero-card">
+      <div class="eyebrow">N I C O S T O R E &nbsp; M Y</div>
+      <h1>TOP UP TANPA RIBET
+        <span>MAIN TANPA BATAS</span>
+      </h1>
+      <p>Top up game kegemaran anda dengan mudah.<br>
+      Pilih produk, tambah ke cart dan sediakan pesanan.</p>
+      <div class="hero-actions">
+        <a class="btn" href="#products">Lihat Produk ↓</a>
+        <a class="btn secondary" href="#checkout">Cara Pesan</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section wrap" id="products">
+    <h2>🔥 <span>BEST SELLER</span></h2>
+    <p class="subtitle">Pilih game dan pakej yang anda perlukan.</p>
+
+    <input class="search" id="searchInput" type="search"
+      placeholder="🔍 Cari game atau region...">
+
+    <div class="filters" id="filters">
+      <button class="filter active" data-filter="Semua">Semua</button>
+      <button class="filter" data-filter="Mobile Legends">Mobile Legends</button>
+      <button class="filter" data-filter="Free Fire">Free Fire</button>
+      <button class="filter" data-filter="Servis">Servis lain</button>
+    </div>
+
+    <div class="grid" id="productGrid"></div>
+
+    <div class="notice">
+      ⚠️ Harga yang dipaparkan ialah harga contoh. Tukar kepada harga sebenar sebelum website diterbitkan.
+    </div>
+  </section>
+
+  <section class="section wrap" id="cart">
+    <h2>🛒 Shopping Cart</h2>
+    <p class="subtitle">Semak produk dan kuantiti pilihan anda.</p>
+    <div class="panel" id="cartPanel"></div>
+  </section>
+
+  <section class="section wrap" id="checkout">
+    <h2>Checkout</h2>
+    <p class="subtitle">Isi maklumat untuk menyediakan pesanan.</p>
+
+    <div class="checkout-grid">
+      <div class="panel">
+        <h3>Maklumat pelanggan</h3>
+
+        <form id="checkoutForm">
+          <div class="field">
+            <label for="customerName">Nama / nickname *</label>
+            <input id="customerName" name="customerName"
+              required maxlength="80" placeholder="Nama anda">
+          </div>
+
+          <div class="field">
+            <label for="contact">Nombor WhatsApp *</label>
+            <input id="contact" name="contact" required
+              maxlength="60" placeholder="+60...">
+          </div>
+
+          <div class="field">
+            <label for="game">Game *</label>
+            <select id="game" name="game" required>
+              <option value="">Pilih game</option>
+              <option>Mobile Legends</option>
+              <option>Free Fire</option>
+              <option>Game lain</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="userId">User ID</label>
+            <input id="userId" name="userId" maxlength="80"
+              placeholder="Masukkan User ID">
+          </div>
+
+          <div class="field">
+            <label for="serverId">Server ID</label>
+            <input id="serverId" name="serverId" maxlength="40"
+              placeholder="Masukkan Server ID">
+          </div>
+
+          <div class="field">
+            <label for="payment">Kaedah pembayaran *</label>
+            <select id="payment" name="payment" required>
+              <option value="">Pilih kaedah</option>
+              <option>DuitNow / Online Banking</option>
+              <option>Touch 'n Go eWallet</option>
+              <option>Lain-lain</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="notes">Nota tambahan</label>
+            <textarea id="notes" name="notes" maxlength="500"
+              placeholder="Nota untuk admin (pilihan)"></textarea>
+          </div>
+
+          <p class="help">Jangan masukkan kata laluan game. Admin perlu mengesahkan harga dan arahan pembayaran.</p>
+          <button class="btn full" type="submit">Sediakan Pesanan</button>
+        </form>
+
+        <div class="success" id="successBox">
+          <strong>Butiran pesanan disediakan.</strong>
+          <p class="help">Salin butiran ini dan hantar kepada admin NicoStore.</p>
+          <pre id="orderText"></pre>
+          <button class="btn full" id="copyOrder" type="button">Salin Pesanan</button>
+          <p class="help" id="copyStatus"></p>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Ringkasan pesanan</h3>
+        <div id="checkoutSummary"></div>
+        <div class="notice">
+          Pesanan ini belum dihantar secara automatik. Admin perlu mengesahkan stok, jumlah akhir dan pembayaran.
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <strong>NICOSTORE MY</strong><br>
+    Game Top Up & Digital Services<br>
+    © <span id="year"></span> NICOSTORE MY
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const PRODUCTS = [
+  {id:"ml-my-86",name:"86 Diamonds",category:"Mobile Legends",region:"Malaysia",price:5,icon:"💎",tag:"Popular"},
+  {id:"ml-my-172",name:"172 Diamonds",category:"Mobile Legends",region:"Malaysia",price:10,icon:"💎",tag:"Diamonds"},
+  {id:"ml-my-257",name:"257 Diamonds",category:"Mobile Legends",region:"Malaysia",price:15,icon:"⚔️",tag:"Diamonds"},
+  {id:"ml-global",name:"Mobile Legends",category:"Mobile Legends",region:"Global",price:10,icon:"🌍",tag:"Global"},
+  {id:"ml-id",name:"Mobile Legends",category:"Mobile Legends",region:"Indonesia",price:9,icon:"🔥",tag:"Indonesia"},
+  {id:"ml-brazil",name:"Mobile Legends",category:"Mobile Legends",region:"Brazil",price:9,icon:"🛡️",tag:"Brazil"},
+  {id:"ff-id",name:"Free Fire Top Up",category:"Free Fire",region:"FF ID",price:5,icon:"🎯",tag:"Free Fire"},
+  {id:"skin",name:"Game Skin",category:"Servis",region:"Sahkan dengan admin",price:12,icon:"🎭",tag:"Skin"},
+  {id:"other",name:"Servis Game Lain",category:"Servis",region:"Hubungi admin",price:5,icon:"🎮",tag:"Custom"}
+];
+
+const CART_KEY = "nicostore_my_cart";
+let cart = loadCart();
+let activeFilter = "Semua";
+
+function money(amount) {
+  return "RM " + Number(amount).toFixed(2);
+}
+
+function loadCart() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(CART_KEY) || "{}");
+    const result = {};
+
+    PRODUCTS.forEach(function(product) {
+      const quantity = Number(saved[product.id]);
+      if (Number.isInteger(quantity) && quantity > 0 && quantity <= 99) {
+        result[product.id] = quantity;
+      }
+    });
+
+    return result;
+  } catch (error) {
+    return {};
+  }
+}
+
+function saveCart() {
+  try {
+    localStorage.setItem(CART_KEY, JSON.stringify(cart));
+  } catch (error) {
+    /* Cart masih boleh digunakan sepanjang halaman dibuka. */
+  }
+}
+
+function itemCount() {
+  return Object.values(cart).reduce(function(sum, quantity) {
+    return sum + quantity;
+  }, 0);
+}
+
+function cartTotal() {
+  return PRODUCTS.reduce(function(sum, product) {
+    return sum + product.price * (cart[product.id] || 0);
+  }, 0);
+}
+
+function showToast(message) {
+  const toast = document.getElementById("toast");
+  toast.textContent = message;
+  toast.classList.add("show");
+
+  window.setTimeout(function() {
+    toast.classList.remove("show");
+  }, 1800);
+}
+
+function renderProducts() {
+  const query = document.getElementById("searchInput").value.toLowerCase().trim();
+
+  const visible = PRODUCTS.filter(function(product) {
+    const matchesCategory =
+      activeFilter === "Semua" || product.category === activeFilter;
+
+    const words = (
+      product.name + " " + product.region + " " + product.category
+    ).toLowerCase();
+
+    return matchesCategory && words.includes(query);
+  });
+
+  const grid = document.getElementById("productGrid");
+
+  if (visible.length === 0) {
+    grid.innerHTML = '<p class="empty">Produk tidak dijumpai.</p>';
+    return;
+  }
+
+  grid.innerHTML = visible.map(function(product) {
+    return '<article class="product">' +
+      '<div class="art">' + product.icon + '</div>' +
+      '<div class="tag">' + product.tag + '</div>' +
+      '<h3>' + product.name + '</h3>' +
+      '<p>Region ' + product.region + '</p>' +
+      '<div class="price-row">' +
+      '<span class="price">' + money(product.price) + '</span>' +
+      '<button class="btn" type="button" data-add="' + product.id + '">+ Add</button>' +
+      '</div></article>';
+  }).join("");
+
+  grid.querySelectorAll("[data-add]").forEach(function(button) {
+    button.addEventListener("click", function() {
+      addItem(button.dataset.add);
+    });
+  });
+}
+
+function addItem(id) {
+  const product = PRODUCTS.find(function(item) {
+    return item.id === id;
+  });
+
+  if (!product) return;
+
+  if ((cart[id] || 0) >= 99) {
+    showToast("Maksimum 99 unit.");
+    return;
+  }
+
+  cart[id] = (cart[id] || 0) + 1;
+  saveCart();
+  renderCart();
+  renderSummary();
+  showToast("Produk ditambah ke cart.");
+}
+
+function changeQuantity(id, difference) {
+  const next = (cart[id] || 0) + difference;
+
+  if (next <= 0) {
+    delete cart[id];
+  } else if (next <= 99) {
+    cart[id] = next;
+  }
+
+  saveCart();
+  renderCart();
+  renderSummary();
+}
+
+function removeItem(id) {
+  delete cart[id];
+  saveCart();
+  renderCart();
+  renderSummary();
+}
+
+function cartMarkup() {
+  const items = PRODUCTS.filter(function(product) {
+    return Boolean(cart[product.id]);
+  });
+
+  if (items.length === 0) {
+    return '<p class="empty">Cart masih kosong. Tambah produk daripada katalog.</p>';
+  }
+
+  const rows = items.map(function(product) {
+    const quantity = cart[product.id];
+
+    return '<div class="cart-item">' +
+      '<div><div class="cart-name">' + product.name + '</div>' +
+      '<div class="muted">Region ' + product.region + ' · ' + money(product.price) + '</div>' +
+      '<div class="qty">' +
+      '<button type="button" data-minus="' + product.id + '">−</button>' +
+      '<strong>' + quantity + '</strong>' +
+      '<button type="button" data-plus="' + product.id + '">+</button>' +
+      '<button type="button" class="remove" data-remove="' + product.id + '">Buang</button>' +
+      '</div></div>' +
+      '<div class="line-total">' + money(product.price * quantity) + '</div>' +
+      '</div>';
+  }).join("");
+
+  return rows +
+    '<div class="total"><span>Anggaran jumlah</span><span>' + money(cartTotal()) + '</span></div>';
+}
+
+function renderCart() {
+  document.getElementById("cartCount").textContent = itemCount();
+
+  const panel = document.getElementById("cartPanel");
+  panel.innerHTML = cartMarkup();
+
+  panel.querySelectorAll("[data-minus]").forEach(function(button) {
+    button.addEventListener("click", function() {
+      changeQuantity(button.dataset.minus, -1);
+    });
+  });
+
+  panel.querySelectorAll("[data-plus]").forEach(function(button) {
+    button.addEventListener("click", function() {
+      changeQuantity(button.dataset.plus, 1);
+    });
+  });
+
+  panel.querySelectorAll("[data-remove]").forEach(function(button) {
+    button.addEventListener("click", function() {
+      removeItem(button.dataset.remove);
+    });
+  });
+}
+
+function renderSummary() {
+  const summary = document.getElementById("checkoutSummary");
+
+  const items = PRODUCTS.filter(function(product) {
+    return Boolean(cart[product.id]);
+  });
+
+  if (items.length === 0) {
+    summary.innerHTML = '<p class="empty">Tambah produk untuk melihat ringkasan.</p>';
+    return;
+  }
+
+  summary.innerHTML = items.map(function(product) {
+    return '<div class="cart-item">' +
+      '<div><div class="cart-name">' + product.name + '</div>' +
+      '<div class="muted">Kuantiti: ' + cart[product.id] + '</div></div>' +
+      '<div class="line-total">' + money(product.price * cart[product.id]) + '</div>' +
+      '</div>';
+  }).join("") +
+  '<div class="total"><span>Anggaran jumlah</span><span>' + money(cartTotal()) + '</span></div>';
+}
+
+function renderAll() {
+  renderProducts();
+  renderCart();
+  renderSummary();
+}
+
+document.getElementById("searchInput").addEventListener("input", function() {
+  renderProducts();
+});
+
+document.getElementById("filters").addEventListener("click", function(event) {
+  const button = event.target.closest("[data-filter]");
+  if (!button) return;
+
+  activeFilter = button.dataset.filter;
+
+  document.querySelectorAll(".filter").forEach(function(item) {
+    item.classList.toggle("active", item === button);
+  });
+
+  renderProducts();
+});
+
+document.getElementById("menuButton").addEventListener("click", function() {
+  document.getElementById("menu").classList.toggle("open");
+});
+
+document.querySelectorAll(".menu a").forEach(function(link) {
+  link.addEventListener("click", function() {
+    document.getElementById("menu").classList.remove("open");
+  });
+});
+
+document.getElementById("checkoutForm").addEventListener("submit", function(event) {
+  event.preventDefault();
+
+  if (itemCount() === 0) {
+    showToast("Cart masih kosong.");
+    document.getElementById("products").scrollIntoView();
+    return;
+  }
+
+  const form = new FormData(event.currentTarget);
+  const reference = "NICO-" + Date.now().toString().slice(-8);
+
+  const orderItems = PRODUCTS.filter(function(product) {
+    return Boolean(cart[product.id]);
+  }).map(function(product) {
+    return "- " + product.name + " (" + product.region + ") x" +
+      cart[product.id] + " = " +
+      money(product.price * cart[product.id]);
+  });
+
+  const lines = [
+    "PESANAN NICOSTORE MY",
+    "Rujukan: " + reference,
+    "",
+    "Nama: " + form.get("customerName"),
+    "WhatsApp: " + form.get("contact"),
+    "Game: " + form.get("game"),
+    "User ID: " + (form.get("userId") || "-"),
+    "Server ID: " + (form.get("serverId") || "-"),
+    "Pembayaran pilihan: " + form.get("payment"),
+    "",
+    "PRODUK:",
+    ...orderItems,
+    "",
+    "ANGGARAN JUMLAH: " + money(cartTotal()),
+    "Nota: " + (form.get("notes") || "-"),
+    "",
+    "Belum dibayar. Sila sahkan harga dan arahan pembayaran dengan admin."
+  ];
+
+  document.getElementById("orderText").textContent = lines.join("\n");
+  document.getElementById("successBox").classList.add("show");
+  document.getElementById("copyStatus").textContent = "";
+
+  document.getElementById("successBox").scrollIntoView({
+    behavior: "smooth",
+    block: "nearest"
+  });
+});
+
+document.getElementById("copyOrder").addEventListener("click", function() {
+  const text = document.getElementById("orderText").textContent;
+  const status = document.getElementById("copyStatus");
+
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(function() {
+      status.textContent = "Berjaya disalin. Hantar butiran kepada admin.";
+    }).catch(function() {
+      selectOrderText(status);
+    });
+  } else {
+    selectOrderText(status);
+  }
+});
+
+function selectOrderText(status) {
+  const order = document.getElementById("orderText");
+  const range = document.createRange();
+  range.selectNodeContents(order);
+
+  const selection = window.getSelection();
+  selection.removeAllRanges();
+  selection.addRange(range);
+
+  status.textContent = "Teks dipilih. Tekan Copy pada telefon anda.";
+}
+
+document.getElementById("year").textContent = new Date().getFullYear();
+
+renderAll();
+</script>
+</body>
+</html>
