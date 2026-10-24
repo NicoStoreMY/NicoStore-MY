@@ -252,7 +252,15 @@ function renderProducts() {
    <p>${p.description}</p>
    <div class="price-row">
     <span class="price">${money(p.price)}</span>
-    <button type="button" class="btn" data-add="${p.id}">+ Add</button>
+    
+${p.id === "skin-basic"
+  ? `<a class="btn" href="./gift-skin.html"
+       style="display:inline-block;text-decoration:none">
+       Choose Options
+     </a>`
+  : `<button type="button" class="btn"
+       data-add="${p.id}">+ Add</button>`}
+
    </div>
   </article>
  `).join("");
@@ -391,10 +399,4 @@ $("copyOrder").addEventListener("click", async () => {
   if (navigator.clipboard && window.isSecureContext) {
    await navigator.clipboard.writeText(text);
   } else {
-   const area = document.createElement("textarea");
-   area.value = text;
-   area.style.position = "fixed";
-   area.style.opacity = "0";
-   document.body.appendChild(area);
-   area.select();
-   const copied = document.execC
+   const area = document.createElement("textarea
