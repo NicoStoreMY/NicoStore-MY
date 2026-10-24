@@ -1,0 +1,365 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gift Skin 11.11 | NicoStore</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;padding:22px 14px;
+  background:#0b0b0f;color:#f5f5f7;
+  font-family:Arial,sans-serif
+}
+.card{
+  max-width:520px;margin:auto;padding:20px;
+  background:#121218;border:1px solid #292933;
+  border-radius:20px
+}
+.header{display:flex;align-items:center;gap:14px}
+.logo{
+  width:65px;height:65px;flex-shrink:0;
+  display:grid;place-items:center;
+  background:#351523;border-radius:15px;font-size:30px
+}
+h1{font-size:23px;margin:0 0 7px}
+.subtitle,.muted{
+  color:#a3a3b2;font-size:13px;line-height:1.5
+}
+.section{margin-top:27px}
+.section h2{font-size:16px;margin:0 0 14px}
+.options{display:grid;gap:9px}
+.option{
+  display:flex;align-items:center;gap:11px;
+  padding:13px;border:1px solid #383842;
+  border-radius:12px;cursor:pointer;line-height:1.4
+}
+.option:has(input:checked){
+  border-color:#a78bfa;background:#1d1928
+}
+input[type=radio]{
+  width:18px;height:18px;
+  accent-color:#a78bfa;flex-shrink:0
+}
+.option-text{flex:1}
+.option-price{
+  display:block;color:#b9b1cb;
+  font-size:13px;margin-top:3px
+}
+.hero-box{margin-bottom:13px}
+.hero-box label{
+  display:block;font-size:13px;
+  margin-bottom:6px;color:#c7c7d1
+}
+select{
+  width:100%;padding:13px;color:#fff;
+  background:#202028;border:1px solid #454552;
+  border-radius:11px;font-size:15px
+}
+.counter{display:flex;align-items:center;gap:18px}
+.counter button{
+  width:43px;height:43px;border:1px solid #454552;
+  border-radius:12px;background:#24242d;
+  color:white;font-size:23px;cursor:pointer
+}
+.counter button:disabled{opacity:.4}
+#quantity{min-width:20px;text-align:center;font-size:19px}
+.total-box{
+  margin-top:25px;padding:18px;
+  background:#24242b;border-radius:15px
+}
+.total-label{color:#b0b0bc;font-size:13px}
+.total-price{
+  margin:9px 0 12px;color:#22c55e;
+  font-size:30px;font-weight:bold;overflow-wrap:anywhere
+}
+.summary{
+  color:#dedee6;font-size:13px;
+  line-height:1.8;overflow-wrap:anywhere
+}
+.copy-button{
+  width:100%;margin-top:16px;padding:14px;
+  border:none;border-radius:12px;
+  background:#a78bfa;color:#17111f;
+  font-size:15px;font-weight:bold;cursor:pointer
+}
+.notice{
+  margin-top:12px;color:#a3a3b2;
+  font-size:12px;line-height:1.6
+}
+@media(max-width:360px){
+  .card{padding:15px}
+  h1{font-size:20px}
+  .total-price{font-size:26px}
+}
+</style>
+</head>
+
+<body>
+<div class="card">
+
+  <div class="header">
+    <div class="logo">🎭</div>
+    <div>
+      <h1>Gift Skin 11.11</h1>
+      <div class="subtitle">
+        Choose your event phase, combo, and heroes.
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>1. Select Event Phase</h2>
+    <div class="options">
+      <label class="option">
+        <input type="radio" name="phase" value="phase1">
+        <span class="option-text">
+          Gift Phase 1
+          <span class="option-price">RM155 / skin</span>
+        </span>
+      </label>
+
+      <label class="option">
+        <input type="radio" name="phase" value="phase2">
+        <span class="option-text">
+          Gift Phase 2
+          <span class="option-price">RM145 / skin</span>
+        </span>
+      </label>
+
+      <label class="option">
+        <input type="radio" name="phase" value="akhir" checked>
+        <span class="option-text">
+          Gift Akhir Event
+          <span class="option-price">RM125 / skin · Special combo prices</span>
+        </span>
+      </label>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>2. Select Combo</h2>
+    <div class="options" id="comboOptions"></div>
+  </div>
+
+  <div class="section">
+    <h2>3. Select Heroes</h2>
+    <p class="muted" id="heroHint"></p>
+    <div id="heroOptions"></div>
+  </div>
+
+  <div class="section">
+    <h2>4. Combo Quantity</h2>
+    <div class="counter">
+      <button type="button" id="minus" aria-label="Decrease quantity">−</button>
+      <strong id="quantity">1</strong>
+      <button type="button" id="plus" aria-label="Increase quantity">+</button>
+    </div>
+    <p class="muted">Quantity refers to the number of identical combo sets.</p>
+  </div>
+
+  <div class="total-box">
+    <div class="total-label">Total Price</div>
+    <div class="total-price" id="total">RM125.00</div>
+    <div class="summary" id="summary"></div>
+    <button type="button" class="copy-button" id="copyOrder">
+      Copy Order Summary
+    </button>
+    <div class="notice" id="copyStatus" aria-live="polite"></div>
+  </div>
+
+</div>
+
+<script>
+const HEROES = [
+  "Nolan","Thamuz","Hayabusa",
+  "Gusion","Wanwan","X-Borg"
+];
+
+const PRICES = {
+  phase1:{1:155,2:305,3:455,4:605},
+  phase2:{1:145,2:285,3:425,4:565},
+  akhir:{1:125,2:240,3:360,4:480}
+};
+
+const PHASE_NAMES = {
+  phase1:"Gift Phase 1",
+  phase2:"Gift Phase 2",
+  akhir:"Gift Akhir Event"
+};
+
+let combo = 1;
+let quantity = 1;
+let selectedHeroes = ["Nolan"];
+
+const $ = id => document.getElementById(id);
+
+function getPhase(){
+  return document.querySelector(
+    'input[name="phase"]:checked'
+  ).value;
+}
+
+function getPrice(){
+  return PRICES[getPhase()][combo];
+}
+
+function money(amount){
+  return "RM"+amount.toFixed(2);
+}
+
+function renderCombos(){
+  const container=$("comboOptions");
+  container.innerHTML="";
+
+  for(let n=1;n<=4;n++){
+    const label=document.createElement("label");
+    label.className="option";
+
+    const radio=document.createElement("input");
+    radio.type="radio";
+    radio.name="combo";
+    radio.value=n;
+    radio.checked=combo===n;
+
+    radio.addEventListener("change",()=>{
+      combo=n;
+      selectedHeroes=Array.from(
+        {length:combo},
+        (_,i)=>selectedHeroes[i]||"Nolan"
+      );
+      renderCombos();
+      renderHeroes();
+      updateTotal();
+    });
+
+    const text=document.createElement("span");
+    text.className="option-text";
+    text.textContent=n+" Skin";
+
+    const price=document.createElement("span");
+    price.className="option-price";
+    price.textContent=money(PRICES[getPhase()][n]);
+
+    text.appendChild(price);
+    label.append(radio,text);
+    container.appendChild(label);
+  }
+}
+
+function renderHeroes(){
+  const container=$("heroOptions");
+  container.innerHTML="";
+
+  $("heroHint").textContent=
+    "Select "+combo+" hero"+(combo>1?"es":"")+
+    " for your "+combo+" skin combo.";
+
+  for(let i=0;i<combo;i++){
+    const wrapper=document.createElement("div");
+    wrapper.className="hero-box";
+
+    const label=document.createElement("label");
+    label.textContent="Hero "+(i+1);
+    label.htmlFor="hero-"+i;
+
+    const select=document.createElement("select");
+    select.id="hero-"+i;
+
+    HEROES.forEach(hero=>{
+      const option=document.createElement("option");
+      option.value=hero;
+      option.textContent=hero;
+      select.appendChild(option);
+    });
+
+    select.value=selectedHeroes[i]||"Nolan";
+
+    select.addEventListener("change",()=>{
+      selectedHeroes[i]=select.value;
+      updateTotal();
+    });
+
+    wrapper.append(label,select);
+    container.appendChild(wrapper);
+  }
+}
+
+function updateTotal(){
+  const total=getPrice()*quantity;
+  $("quantity").textContent=quantity;
+  $("minus").disabled=quantity<=1;
+  $("total").textContent=money(total);
+
+  const heroText=selectedHeroes
+    .slice(0,combo)
+    .map((hero,i)=>(i+1)+". "+hero)
+    .join(" · ");
+
+  $("summary").textContent=
+    "Phase: "+PHASE_NAMES[getPhase()]+"\n"+
+    "Combo: "+combo+" skin(s)\n"+
+    "Quantity: "+quantity+" set(s)\n"+
+    "Heroes: "+heroText;
+
+  $("copyStatus").textContent="";
+}
+
+document.querySelectorAll('input[name="phase"]')
+.forEach(input=>{
+  input.addEventListener("change",()=>{
+    renderCombos();
+    updateTotal();
+  });
+});
+
+$("minus").addEventListener("click",()=>{
+  quantity=Math.max(1,quantity-1);
+  updateTotal();
+});
+
+$("plus").addEventListener("click",()=>{
+  quantity++;
+  updateTotal();
+});
+
+$("copyOrder").addEventListener("click",async()=>{
+  const orderText=
+    "NicoStore - Gift Skin 11.11\n"+
+    "Phase: "+PHASE_NAMES[getPhase()]+"\n"+
+    "Combo: "+combo+" skin(s)\n"+
+    "Combo quantity: "+quantity+"\n"+
+    "Heroes: "+selectedHeroes.slice(0,combo).join(", ")+"\n"+
+    "Total skins: "+(combo*quantity)+"\n"+
+    "Total price: "+money(getPrice()*quantity);
+
+  try{
+    if(navigator.clipboard && window.isSecureContext){
+      await navigator.clipboard.writeText(orderText);
+    }else{
+      const area=document.createElement("textarea");
+      area.value=orderText;
+      area.style.position="fixed";
+      area.style.opacity="0";
+      document.body.appendChild(area);
+      area.select();
+      const copied=document.execCommand("copy");
+      area.remove();
+      if(!copied) throw new Error("Copy failed");
+    }
+
+    $("copyStatus").textContent="Order summary copied successfully!";
+  }catch(error){
+    $("copyStatus").textContent=
+      "Automatic copying is unavailable. Please open the page in your browser.";
+  }
+});
+
+renderCombos();
+renderHeroes();
+updateTotal();
+</script>
+</body>
+</html>
