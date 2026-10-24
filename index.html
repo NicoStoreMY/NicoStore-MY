@@ -252,7 +252,12 @@ $("copyOrder").addEventListener("click",async()=>{
  }catch(err){$("copyStatus").textContent="Copy failed. Please select and copy the order details manually.";}
 });
 $("year").textContent=new Date().getFullYear();
-renderAll();
+try {
+  renderAll();
+} catch (error) {
+  document.getElementById("productGrid").innerHTML =
+    "<p style='color:white'>ERROR: " + error.message + "</p>";
+}
 </script>
 </body>
 </html>
