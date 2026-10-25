@@ -164,30 +164,31 @@ button{cursor:pointer}
   <h1>NICOSTORE 🇲🇾<br><span style="color:#f0b5c5">Gift Skin & Services</span></h1>
   <p>Choose your favourite products, enter your order details, and proceed to checkout. Every order is reviewed manually by the NicoStore admin.</p>
   <div class="hero-buttons">
-   <a href="#products" class="btn">Browse products ↓</a>
-   <a href="#checkout" class="btn secondary">How to order</a>
+   <a href="#products" class="btn">Product ↓</a>
+   <a href="#checkout" class="btn secondary">Checkout</a>
   </div>
   <div class="pill-row">
-   <span class="pill">◆ Prices displayed</span>
-   <span class="pill">◆ Easy checkout</span>
-   <span class="pill">◆ Manual processing</span>
+   <span class="pill">◆ Trusted</span>
+   <span class="pill">◆ Recommended</span>
+   <span class="pill">◆ Fast Services</span>
   </div>
  </div>
 </section>
 
 <section id="products" class="section wrap">
  <div class="section-head">
-  <div><h2>Product catalogue</h2><p class="sub">Choose a package and add it to your cart.</p></div>
+  <div><h2>Product Catalogue</h2><p class="sub">Choose a package and add it to your cart.</p></div>
  </div>
  <div class="filters" id="filters">
   <button type="button" class="filter active" data-filter="All">All</button>
   <button type="button" class="filter" data-filter="Recharge">Recharge</button>
+  <button type="button" class="filter" data-filter="Via Login">Via Login</button>
   <button type="button" class="filter" data-filter="Starlight Card">Starlight Card</button>
   <button type="button" class="filter" data-filter="Gift Skin">Gift Skin</button>
   <button type="button" class="filter" data-filter="Service">Service</button>
  </div>
  <div class="grid" id="productGrid"><p class="sub">Loading products...</p></div>
- <div class="notice">⚠️ <strong>Reminder:</strong> Confirm product prices and availability with the admin before payment.</div>
+ <div class="notice">⚠️ <strong>Reminder:</strong> Prices and stock are subject to change.</div>
 </section>
 
 <section id="cart" class="section wrap">
@@ -218,33 +219,34 @@ button{cursor:pointer}
      <select id="game" name="game" required>
       <option value="">Choose product category</option>
       <option>Recharge</option>
+      <option>Via Login</option>
       <option>Starlight Card</option>
       <option>Gift Skin</option>
       <option>Service</option>
      </select>
     </div>
     <div class="field">
-     <label for="userId">In-game Nickname / User ID</label>
-     <input id="userId" name="userId" maxlength="100" placeholder="Enter nickname or User ID">
+     <label for="userId">In-game Nickname (IGN)</label>
+     <input id="userId" name="userId" maxlength="100" placeholder="Enter nickname">
     </div>
     <div class="field">
-     <label for="serverId">Server ID</label>
-     <input id="serverId" name="serverId" maxlength="40" placeholder="Enter Server ID">
+     <label for="ID Server">ID Server</label>
+     <input id="Idserver" name="Idserver" maxlength="40" placeholder="Enter ID Server">
     </div>
     <div class="field">
      <label for="payment">Preferred Payment Method</label>
      <select id="payment" name="payment" required>
       <option value="">Choose a payment method</option>
+      <option>DuitNow QR</option>
       <option>ShopeePay</option>
       <option>TNG eWallet</option>
-      <option>DuitNow QR</option>
      </select>
     </div>
     <div class="field">
      <label for="notes">Additional notes (optional)</label>
      <textarea id="notes" name="notes" maxlength="500" placeholder="Notes for the admin..."></textarea>
     </div>
-    <p class="help">Never enter your game password. The admin will confirm the final amount and payment instructions.</p>
+    <p class="help">Disclaimer: Please ensure all information is entered correctly. The admin will not be responsible for any errors caused by incorrect information provided by the customer.</p>
     <button type="submit" class="btn full">Prepare Order</button>
    </form>
 
