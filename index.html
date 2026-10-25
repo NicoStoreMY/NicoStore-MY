@@ -287,15 +287,45 @@ const PRODUCTS = [
  {id:"weekly-elite-bundle",name:"Weekly Elite Pass",category:"Recharge",price:4,description:"Manual processing",icon:"💎",tag:"Recharge"},
  {id:"starlight-basic",name:"Starlight Basic",category:"Starlight Card",price:12,description:"Delay 8 days",icon:"⭐",tag:"Starlight Card"},
  {id:"starlight-premium",name:"Starlight Premium",category:"Starlight Card",price:22,description:"Delay 8 days",icon:"🌟",tag:"Starlight Card"},
- {id:"skin-11",name:"Event 11.11 - Phase 1",category:"Gift Skin",price:155.00,description:"Buy more than 1 skin to get special prices. Final price confirmed by admin",icon:"🥇",tag:"Gift Skin"},
- {id:"skin-11",name:"Event 11.11 - Phase 2",category:"Gift Skin",price:145.00,description:"Buy more than 1 skin to get special prices. Final price confirmed by admin",icon:"🥈",tag:"Gift Skin"},
- {id:"skin-11",name:"Event 11.11 - Akhir Event",category:"Gift Skin",price:125.00,description:"Buy more than 1 skin to get special prices. Final price confirmed by admin",icon:"🥉",tag:"Gift Skin"},
- {id:"item-shop",name:"Shop Skin - 1089 💎",category:"Gift Skin",price:39.00,description:"Confirm details with admin.",icon:"🛍️",tag:"Gift Skin"},
- {id:"item-shop",name:"Shop Skin - 899 💎",category:"Gift Skin",price:32.00,description:"Confirm details with admin.",icon:"🛍️",tag:"Gift Skin"},
- {id:"item-shop",name:"Shop Skin - 749 💎",category:"Gift Skin",price:28.00,description:"Confirm details with admin.",icon:"🛍️",tag:"Gift Skin"},
- {id:"item-shop",name:"Shop Emote - 79 💎",category:"Gift Skin",price:5.00,description:"Confirm details with admin.",icon:"🛍️",tag:"Gift Skin"},
+ {id:"skin-shop-1089-💎",name:"Shop Skin - 1089 💎",category:"Gift Skin",price:39.00,description:"Confirm details with admin.",icon:"🛍️",tag:"Gift Skin"},
+ {id:"skin-shop-899-💎",name:"Shop Skin - 899 💎",category:"Gift Skin",price:32.00,description:"Confirm details with admin.",icon:"🛍️",tag:"Gift Skin"},
+ {id:"skin-shop-749-💎",name:"Shop Skin - 749 💎",category:"Gift Skin",price:28.00,description:"Confirm details with admin.",icon:"🛍️",tag:"Gift Skin"},
+ {id:"emote-shop-79-💎",name:"Shop Emote - 79 💎",category:"Gift Skin",price:5.00,description:"Confirm details with admin.",icon:"🛍️",tag:"Gift Skin"},
  {id:"jokispin",name:"Jokispin",category:"Service",price:8,description:"Confirm details with admin.",icon:"🎯",tag:"Service"},
- {id:"other-service",name:"Other Game Service",category:"Service",price:5,description:"Contact admin to confirm scope and price.",icon:"🎮",tag:"Custom"}
+ {id:"event-1111",name:"Event 11.11",category:"Gift Skin",price:155,description:"Choose your event phase, number of skins and heroes.",icon:"🥇",tag:"Gift Skin"},
+  {id:"squad",
+  name:"Squad Verified",
+  category:"Service",
+  price:5,
+  description:"Choose your preferred squad name.",
+  icon:"🛡️",
+  tag:"Squad"
+ }
+];
+
+const DURATION_OPTIONS = [
+ {id:"5-days", name:"5 Days", price:5.90},
+ {id:"7-days", name:"7 Days", price:8.60},
+ {id:"10-days", name:"10 Days", price:10.20},
+ {id:"15-days", name:"15 Days", price:12.40},
+ {id:"30-days", name:"30 Days", price:17.80},
+ {id:"60-days", name:"60 Days", price:29.70},
+ {id:"90-days", name:"90 Days", price:41.90}
+];
+
+const EVENT_OPTIONS = [
+ {id:"phase-1",name:"Phase 1",price:155,discounts:{1:0,2:5,3:10,4:15}},
+ {id:"phase-2",name:"Phase 2",price:145,discounts:{1:0,2:5,3:10,4:15}},
+ {id:"akhir-event",name:"Akhir Event",price:125,discounts:{1:0,2:10,3:15,4:20}}
+];
+
+const EVENT_HEROES = [
+ "Nolan",
+ "Thamuz",
+ "Hayabusa",
+ "Gusion",
+ "Wanwan",
+ "X-Borg"
 ];
 
 const CART_KEY = "nicostore_cart_v1";
@@ -319,12 +349,31 @@ function itemTotal(p){
  return p.price == null ? null : p.price * (cart[p.id] || 0);
 }
 
+
+
 function total(){
- return PRODUCTS.reduce((sum,p)=>{
-  if(p.price == null) return sum;
-  return sum + p.price * (cart[p.id] || 0);
- },0);
+ let sum=0;
+
+ PRODUCTS.forEach(p=>{
+  if(p.price==null)return;
+  sum+=p.price*(cart[p.id]||0);
+ });
+
+ DURATION_OPTIONS.forEach(d=>{
+  sum+=d.price*(cart["squad-"+d.id]||0);
+ });
+
+ const eventItems=JSON.parse(
+  localStorage.getItem("nicostore_event_items")||"[]"
+ );
+
+ eventItems.forEach(item=>{
+  sum+=item.price*(cart[item.id]||0);
+ });
+
+ return sum;
 }
+
 
 function totalLabel(){
  return hasSpecialPrice()
@@ -332,18 +381,47 @@ function totalLabel(){
   : "Estimated total";
 }
 
+
 function loadCart(){
  try{
   const saved=JSON.parse(localStorage.getItem(CART_KEY)||"{}");
   if(!saved||typeof saved!=="object"||Array.isArray(saved))return {};
+
   const valid={};
+
   PRODUCTS.forEach(p=>{
    const q=Number(saved[p.id]);
-   if(Number.isInteger(q)&&q>0&&q<10000)valid[p.id]=q;
+   if(Number.isInteger(q)&&q>0&&q<10000){
+    valid[p.id]=q;
+   }
   });
-  return valid;
- }catch(e){return {};}
+
+  DURATION_OPTIONS.forEach(d=>{
+   const id="squad-"+d.id;
+   const q=Number(saved[id]);
+   if(Number.isInteger(q)&&q>0&&q<10000){
+    valid[id]=q;
+   }
+  });
+
+  
+const eventItems=JSON.parse(
+ localStorage.getItem("nicostore_event_items")||"[]"
+);
+
+eventItems.forEach(item=>{
+ const q=Number(saved[item.id]);
+ if(Number.isInteger(q)&&q>0&&q<10000){
+  valid[item.id]=q;
+ }
+});
+
+return valid;
+ }catch(e){
+  return {};
+ }
 }
+
 
 function saveCart(){
  try{localStorage.setItem(CART_KEY,JSON.stringify(cart));}catch(e){}
@@ -359,6 +437,8 @@ function showToast(message){
  t.classList.add("show");
  window.setTimeout(()=>t.classList.remove("show"),1800);
 }
+
+
 
 function renderProducts(){
  const grid=$("productGrid");
@@ -376,126 +456,73 @@ function renderProducts(){
     <div><div class="tag">${p.tag}</div><h3>${p.name}</h3></div>
    </div>
    <p>${p.description}</p>
-   <div class="price-row">
-    <span class="price">${displayPrice(p)}</span>
-    <button type="button" class="btn" data-add="${p.id}">+ Add</button>
-   </div>
+
+   ${p.id==="squad" ? `
+    <div style="margin:12px 0">
+     <label for="squad-duration" style="display:block;margin-bottom:6px">Choose Duration</label>
+     <select id="squad-duration" class="btn" style="width:100%">
+      ${DURATION_OPTIONS.map(d=>`
+       <option value="${d.id}">${d.name} — RM ${d.price.toFixed(2)}</option>
+      `).join("")}
+     </select>
+    </div>
+    <div class="price-row">
+     <span class="price" id="squad-price">RM ${DURATION_OPTIONS[0].price.toFixed(2)}</span>
+     <button type="button" class="btn" data-squad-add>+ Add</button>
+    </div>
+   ` : p.id==="event-1111" ? `
+    <div style="margin:12px 0">
+     <label for="event-phase">Choose Phase</label>
+     <select id="event-phase" class="btn" style="width:100%">
+      ${EVENT_OPTIONS.map(o=>`
+       <option value="${o.id}">${o.name}</option>
+      `).join("")}
+     </select>
+
+     <label for="event-skins" style="display:block;margin-top:10px">Number of Skins</label>
+     <select id="event-skins" class="btn" style="width:100%">
+      <option value="1">1 Skin</option>
+      <option value="2">2 Skins</option>
+      <option value="3">3 Skins</option>
+      <option value="4">4 Skins</option>
+     </select>
+
+     <div id="event-heroes" style="margin-top:10px"></div>
+    </div>
+    <div class="price-row">
+     <span class="price" id="event-price">RM 155.00</span>
+     <button type="button" class="btn" data-event-add>+ Add</button>
+    </div>
+   ` : `
+    <div class="price-row">
+     <span class="price">${displayPrice(p)}</span>
+     <button type="button" class="btn" data-add="${p.id}">+ Add</button>
+    </div>
+   `}
   </article>
  `).join("");
 
  grid.querySelectorAll("[data-add]").forEach(b=>{
   b.addEventListener("click",()=>add(b.dataset.add));
  });
-}
 
-function add(id){
- const p=PRODUCTS.find(x=>x.id===id);
- if(!p)return;
+ const durationSelect=grid.querySelector("#squad-duration");
+ if(durationSelect){
+  durationSelect.addEventListener("change",()=>{
+   const d=DURATION_OPTIONS.find(x=>x.id===durationSelect.value);
+   if(d)grid.querySelector("#squad-price").textContent="RM "+d.price.toFixed(2);
+  });
 
- cart[id]=(cart[id]||0)+1;
- saveCart();
- renderAll();
- showToast(p.name+" added to cart");
-}
-
-function change(id,delta){
- const next=(cart[id]||0)+delta;
- if(next<=0)delete cart[id];
- else cart[id]=next;
- saveCart();
- renderAll();
-}
-
-function removeItem(id){
- delete cart[id];
- saveCart();
- renderAll();
-}
-
-function cartRows(){
- const items=PRODUCTS.filter(p=>cart[p.id]);
-
- if(!items.length){
-  return '<div class="empty">Your cart is empty. Choose a product from the catalogue above.</div>';
+  grid.querySelector("[data-squad-add]").addEventListener("click",()=>{
+   const d=DURATION_OPTIONS.find(x=>x.id===durationSelect.value);
+   if(d)addSquad(d);
+  });
  }
 
- return items.map(p=>{
-  const lineTotal=itemTotal(p);
-  return `
-   <div class="cart-item">
-    <div>
-     <div class="cart-name">${p.name}</div>
-     <div class="cart-meta">${displayPrice(p)} each</div>
-     <div class="qty">
-      <button type="button" data-minus="${p.id}" aria-label="Decrease ${p.name}">−</button>
-      <strong>${cart[p.id]}</strong>
-      <button type="button" data-plus="${p.id}" aria-label="Increase ${p.name}">+</button>
-      <button type="button" class="remove" data-remove="${p.id}">Remove</button>
-     </div>
-    </div>
-    <div class="line-total">${lineTotal===null?"TBC":money(lineTotal)}</div>
-   </div>
-  `;
- }).join("")+
- `<div class="total-row"><span>${totalLabel()}</span><span>${money(total())}</span></div>`+
- (hasSpecialPrice()
-  ? '<p class="help">Special-price products are excluded from this subtotal. The admin will confirm the final amount.</p>'
-  : '<p class="help">Final amount is subject to admin confirmation.</p>');
-}
+ const phaseSelect=grid.querySelector("#event-phase");
+ const skinsSelect=grid.querySelector("#event-skins");
+ const heroesBox=grid.querySelector("#event-heroes");
+ const eventPrice=grid.querySelector("#event-price");
 
-function renderCart(){
- $("cartCount").textContent=count();
- $("cartPanel").innerHTML=cartRows();
-
- $("cartPanel").querySelectorAll("[data-minus]").forEach(b=>{
-  b.addEventListener("click",()=>change(b.dataset.minus,-1));
- });
- $("cartPanel").querySelectorAll("[data-plus]").forEach(b=>{
-  b.addEventListener("click",()=>change(b.dataset.plus,1));
- });
- $("cartPanel").querySelectorAll("[data-remove]").forEach(b=>{
-  b.addEventListener("click",()=>removeItem(b.dataset.remove));
- });
-}
-
-function renderSummary(){
- const box=$("checkoutSummary");
- const items=PRODUCTS.filter(p=>cart[p.id]);
-
- if(!items.length){
-  box.innerHTML='<div class="empty">Add products to your cart to see the order summary.</div>';
-  return;
- }
-
- box.innerHTML=items.map(p=>`
-  <div class="cart-item">
-   <div>
-    <div class="cart-name">${p.name}</div>
-    <div class="cart-meta">Quantity: ${cart[p.id]} · ${displayPrice(p)} each</div>
-   </div>
-   <div class="line-total">${itemTotal(p)===null?"TBC":money(itemTotal(p))}</div>
-  </div>
- `).join("")+
- `<div class="total-row"><span>${totalLabel()}</span><span>${money(total())}</span></div>`+
- (hasSpecialPrice()
-  ? '<p class="help">Special-price items are excluded. Final price will be confirmed by the admin.</p>'
-  : '');
-}
-
-function renderAll(){
- renderProducts();
- renderCart();
- renderSummary();
-}
-
-$("filters").addEventListener("click",e=>{
- const b=e.target.closest("[data-filter]");
- if(!b)return;
-
- activeFilter=b.dataset.filter;
- $("filters").querySelectorAll(".filter").forEach(x=>{
-  x.classList.toggle("active",x===b);
- });
- renderProducts();
-});
-
+ if(phaseSelect&&skinsSelect&&heroesBox&&eventPrice){
+  function updateEvent(
