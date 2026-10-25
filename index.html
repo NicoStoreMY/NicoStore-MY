@@ -873,11 +873,17 @@ $("copyOrder").addEventListener("click",async()=>{
 
 $("year").textContent=new Date().getFullYear();
 
-try{
- renderAll();
-}catch(error){
- $("productGrid").textContent="ERROR: "+error.message;
+
+try {
+  renderAll();
+} catch (error) {
+  console.error("NicoStore error:", error);
+  document.getElementById("productGrid").innerHTML =
+    '<p style="color:#ff8fa8">Produk gagal dimuatkan: ' +
+    error.message +
+    '</p>';
 }
+
 </script>
 </body>
 </html>
