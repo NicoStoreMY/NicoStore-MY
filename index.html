@@ -524,5 +524,360 @@ function renderProducts(){
  const heroesBox=grid.querySelector("#event-heroes");
  const eventPrice=grid.querySelector("#event-price");
 
- if(phaseSelect&&skinsSelect&&heroesBox&&eventPrice){
-  function updateEvent(
+  if(phaseSelect&&skinsSelect&&heroesBox&&eventPrice){
+  function updateEvent(){
+   const phase=EVENT_OPTIONS.find(o=>o.id===phaseSelect.value);
+   const count=Number(skinsSelect.value);
+   if(!phase)return;
+
+   heroesBox.innerHTML=Array.from({length:count},(_,i)=>`
+    <label style="display:block;margin-top:8px">Hero for Skin ${i+1}</label>
+    <select class="btn event-hero" style="width:100%;margin-top:4px">
+     ${EVENT_HEROES.map((h,j)=>`
+      <option value="${h}" ${j===i?"selected":""}>${h}</option>
+     `).join("")}
+    </select>
+   `).join("");
+
+   const discount=phase.discounts[count]||0;
+   const price=phase.price*count-discount;
+   eventPrice.textContent="RM "+price.toFixed(2);
+  }
+
+  phaseSelect.addEventListener("change",updateEvent);
+  skinsSelect.addEventListener("change",updateEvent);
+  updateEvent();
+
+  grid.querySelector("[data-event-add]").addEventListener("click",()=>{
+   const phase=EVENT_OPTIONS.find(o=>o.id===phaseSelect.value);
+   const heroes=[...heroesBox.querySelectorAll(".event-hero")].map(s=>s.value);
+   const count=Number(skinsSelect.value);
+
+   if(new Set(heroes).size!==heroes.length){
+    showToast("Choose a different hero for each skin");
+    return;
+   }
+
+   const discount=phase.discounts[count]||0;
+   const price=phase.price*count-discount;
+
+   addEventItem({
+    phaseId:phase.id,
+    phaseName:phase.name,
+    count,
+    heroes,
+    price
+   });
+  });
+ }
+}
+
+
+function add(id){
+ const p=PRODUCTS.find(x=>x.id===id);
+ if(!p)return;
+
+ cart[id]=(cart[id]||0)+1;
+ saveCart();
+ renderAll();
+ showToast(p.name+" added to cart");
+}
+
+function addSquad(duration){
+ const id="squad-"+duration.id;
+ const name="Squad Verified - "+duration.name;
+
+ if(!cart[id]){
+  cart[id]=0;
+ }
+ cart[id]++;
+
+ localStorage.setItem("nicostore_squad_"+duration.id,JSON.stringify({
+  id:id,
+  name:name,
+  price:duration.price
+ }));
+
+ saveCart();
+ renderAll();
+ showToast(name+" added to cart");
+}
+
+function addEventItem(event){
+ const id="event-1111-"+Date.now()+"-"+Math.random().toString(36).slice(2,6);
+
+ const item={
+  id,
+  phaseId:event.phaseId,
+  phaseName:event.phaseName,
+  count:event.count,
+  heroes:event.heroes,
+  price:event.price,
+  name:"Event 11.11 - "+event.phaseName+" ("+event.count+" Skin)"
+ };
+
+ const saved=JSON.parse(localStorage.getItem("nicostore_event_items")||"[]");
+ saved.push(item);
+ localStorage.setItem("nicostore_event_items",JSON.stringify(saved));
+
+ cart[id]=1;
+ saveCart();
+ renderAll();
+ showToast(item.name+" added to cart");
+}
+
+function change(id,delta){
+ const next=(cart[id]||0)+delta;
+ if(next<=0)delete cart[id];
+ else cart[id]=next;
+ saveCart();
+ renderAll();
+}
+
+function removeItem(id){
+ delete cart[id];
+ saveCart();
+ renderAll();
+}
+
+
+
+function cartRows(){
+ const items=PRODUCTS.filter(p=>cart[p.id]);
+
+ const normalItems=items.map(p=>{
+  const lineTotal=itemTotal(p);
+  return `
+   <div class="cart-item">
+    <div>
+     <div class="cart-name">${p.name}</div>
+     <div class="cart-meta">${displayPrice(p)} each</div>
+     <div class="qty">
+      <button type="button" data-minus="${p.id}">−</button>
+      <strong>${cart[p.id]}</strong>
+      <button type="button" data-plus="${p.id}">+</button>
+      <button type="button" class="remove" data-remove="${p.id}">Remove</button>
+     </div>
+    </div>
+    <div class="line-total">${lineTotal===null?"TBC":money(lineTotal)}</div>
+   </div>`;
+ }).join("");
+
+ const squadItems=DURATION_OPTIONS.filter(d=>cart["squad-"+d.id]).map(d=>{
+  const id="squad-"+d.id;
+  const q=cart[id];
+  return `
+   <div class="cart-item">
+    <div>
+     <div class="cart-name">Squad Verified - ${d.name}</div>
+     <div class="cart-meta">${money(d.price)} each</div>
+     <div class="qty">
+      <button type="button" data-minus="${id}">−</button>
+      <strong>${q}</strong>
+      <button type="button" data-plus="${id}">+</button>
+      <button type="button" class="remove" data-remove="${id}">Remove</button>
+     </div>
+    </div>
+    <div class="line-total">${money(d.price*q)}</div>
+   </div>`;
+ }).join("");
+
+ const eventItems=JSON.parse(localStorage.getItem("nicostore_event_items")||"[]");
+ const eventRows=eventItems.filter(item=>cart[item.id]).map(item=>{
+  const q=cart[item.id];
+  return `
+   <div class="cart-item">
+    <div>
+     <div class="cart-name">${item.name}</div>
+     <div class="cart-meta">${item.heroes.join(", ")}</div>
+     <div class="cart-meta">${money(item.price)} per combo</div>
+     <div class="qty">
+      <button type="button" data-minus="${item.id}">−</button>
+      <strong>${q}</strong>
+      <button type="button" data-plus="${item.id}">+</button>
+      <button type="button" class="remove" data-remove="${item.id}">Remove</button>
+     </div>
+    </div>
+    <div class="line-total">${money(item.price*q)}</div>
+   </div>`;
+ }).join("");
+
+ if(!normalItems&&!squadItems&&!eventRows){
+  return '<div class="empty">Your cart is empty. Choose a product from the catalogue above.</div>';
+ }
+
+ return normalItems+squadItems+eventRows+
+  `<div class="total-row"><span>${totalLabel()}</span><span>${money(total())}</span></div>`+
+  '<p class="help">Final amount is subject to admin confirmation.</p>';
+}
+
+function renderCart(){
+ $("cartCount").textContent=count();
+ $("cartPanel").innerHTML=cartRows();
+
+ $("cartPanel").querySelectorAll("[data-minus]").forEach(b=>{
+  b.addEventListener("click",()=>change(b.dataset.minus,-1));
+ });
+ $("cartPanel").querySelectorAll("[data-plus]").forEach(b=>{
+  b.addEventListener("click",()=>change(b.dataset.plus,1));
+ });
+ $("cartPanel").querySelectorAll("[data-remove]").forEach(b=>{
+  b.addEventListener("click",()=>removeItem(b.dataset.remove));
+ });
+}
+
+function renderSummary(){
+ const box=$("checkoutSummary");
+ const items=PRODUCTS.filter(p=>cart[p.id]);
+
+ if(!items.length){
+  box.innerHTML='<div class="empty">Add products to your cart to see the order summary.</div>';
+  return;
+ }
+
+ box.innerHTML=items.map(p=>`
+  <div class="cart-item">
+   <div>
+    <div class="cart-name">${p.name}</div>
+    <div class="cart-meta">Quantity: ${cart[p.id]} · ${displayPrice(p)} each</div>
+   </div>
+   <div class="line-total">${itemTotal(p)===null?"TBC":money(itemTotal(p))}</div>
+  </div>
+ `).join("")+
+ `<div class="total-row"><span>${totalLabel()}</span><span>${money(total())}</span></div>`+
+ (hasSpecialPrice()
+  ? '<p class="help">Special-price items are excluded. Final price will be confirmed by the admin.</p>'
+  : '');
+}
+
+function renderAll(){
+ renderProducts();
+ renderCart();
+ renderSummary();
+}
+
+$("filters").addEventListener("click",e=>{
+ const b=e.target.closest("[data-filter]");
+ if(!b)return;
+
+ activeFilter=b.dataset.filter;
+ $("filters").querySelectorAll(".filter").forEach(x=>{
+  x.classList.toggle("active",x===b);
+ });
+ renderProducts();
+});
+
+$("checkoutForm").addEventListener("submit",e=>{
+ e.preventDefault();
+
+ if(!count()){
+  showToast("Your cart is empty");
+  $("products").scrollIntoView({behavior:"smooth"});
+  return;
+ }
+
+ const f=new FormData(e.currentTarget);
+ const items=PRODUCTS.filter(p=>cart[p.id]);
+
+ const orderId="NICO-"+
+  new Date().toISOString().slice(0,10).replaceAll("-","")+"-"+
+  Math.random().toString(36).slice(2,6).toUpperCase();
+
+ 
+const lines=items.map(p=>{
+  const lineTotal=itemTotal(p);
+  return lineTotal===null
+   ? `- ${p.name} x${cart[p.id]} = SPECIAL PRICE (admin to confirm)`
+   : `- ${p.name} x${cart[p.id]} = ${money(lineTotal)}`;
+ });
+
+DURATION_OPTIONS.forEach(d=>{
+  const id="squad-"+d.id;
+  const quantity=cart[id]||0;
+
+  if(quantity>0){
+    const lineTotal=d.price*quantity;
+    lines.push(
+      `- Squad Verified - ${d.name} x${quantity} = ${money(lineTotal)}`
+    );
+  }
+});
+
+const eventItems=JSON.parse(
+ localStorage.getItem("nicostore_event_items")||"[]"
+);
+
+eventItems.forEach(item=>{
+ const quantity=cart[item.id]||0;
+
+ if(quantity>0){
+  lines.push(
+   `- ${item.name} x${quantity}`,
+   `  Heroes: ${item.heroes.join(", ")}`,
+   `  Price: ${money(item.price*quantity)}`
+  );
+ }
+});
+
+ const textOut=[
+  "NEW ORDER — NICOSTORE",
+  `Reference: ${orderId}`,
+  "",
+  `Name: ${f.get("customerName")}`,
+  `Contact: ${f.get("contact")}`,
+  
+  `Category: ${f.get("game")}`,
+  `User ID / IGN: ${f.get("userId")||"-"}`,
+  `Server ID: ${f.get("serverId")||"-"}`,
+  `Preferred payment: ${f.get("payment")}`,
+  "",
+  "ORDER ITEMS:",
+  ...lines,
+  "",
+  `${totalLabel().toUpperCase()}: ${money(total())}`,
+  `Notes: ${f.get("notes")||"-"}`,
+  "",
+  "Special prices and final amount must be confirmed by the admin.",
+  "Please confirm stock and payment instructions. UNPAID."
+ ].join("\n");
+
+ $("orderText").textContent=textOut;
+ $("successBox").classList.add("show");
+ $("copyStatus").textContent="";
+ $("successBox").scrollIntoView({behavior:"smooth",block:"nearest"});
+});
+
+$("copyOrder").addEventListener("click",async()=>{
+ const text=$("orderText").textContent;
+
+ try{
+  if(navigator.clipboard&&window.isSecureContext){
+   await navigator.clipboard.writeText(text);
+  }else{
+   const area=document.createElement("textarea");
+   area.value=text;
+   area.style.position="fixed";
+   area.style.opacity="0";
+   document.body.appendChild(area);
+   area.select();
+   const copied=document.execCommand("copy");
+   area.remove();
+   if(!copied)throw new Error("Copy failed");
+  }
+
+  $("copyStatus").textContent="Order details copied. Paste and send them to the admin.";
+ }catch(err){
+  $("copyStatus").textContent="Copy failed. Please select and copy the order details manually.";
+ }
+});
+
+$("year").textContent=new Date().getFullYear();
+
+try{
+ renderAll();
+}catch(error){
+ $("productGrid").textContent="ERROR: "+error.message;
+}
+</script>
+</body>
+</html>
