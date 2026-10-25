@@ -524,7 +524,7 @@ function renderProducts(){
  const heroesBox=grid.querySelector("#event-heroes");
  const eventPrice=grid.querySelector("#event-price");
 
-  if(phaseSelect&&skinsSelect&&heroesBox&&eventPrice){
+ if(phaseSelect&&skinsSelect&&heroesBox&&eventPrice){
   function updateEvent(){
    const phase=EVENT_OPTIONS.find(o=>o.id===phaseSelect.value);
    const count=Number(skinsSelect.value);
@@ -873,17 +873,11 @@ $("copyOrder").addEventListener("click",async()=>{
 
 $("year").textContent=new Date().getFullYear();
 
-
-try {
-  renderAll();
-} catch (error) {
-  console.error("NicoStore error:", error);
-  document.getElementById("productGrid").innerHTML =
-    '<p style="color:#ff8fa8">Produk gagal dimuatkan: ' +
-    error.message +
-    '</p>';
+try{
+ renderAll();
+}catch(error){
+ $("productGrid").textContent="ERROR: "+error.message;
 }
-
 </script>
 </body>
 </html>
